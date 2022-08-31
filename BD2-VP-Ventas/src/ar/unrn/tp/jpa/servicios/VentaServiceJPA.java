@@ -47,16 +47,13 @@ public class VentaServiceJPA implements VentaService {
 			promosActivas = promosAll.getResultList();
 
 			// Armo la lista de productos vendidos
-			List<Producto> productosVendidos = new ArrayList<>();
-			for (Long idProducto : productosID) {
-				Producto prod = em.find(Producto.class, idProducto);
-				productosVendidos.add(prod);
-			}
+			TypedQuery<Producto> productosFromList = em
+					.createQuery("select prod from Producto prod where prod.idProducto in :prodIDList", Producto.class);
+			productosFromList.setParameter("prodIDList", productosID);
+			List<Producto> productosElegidos = productosFromList.getResultList();
 
 			CarritoCompra carrito = new CarritoCompra(cliente, promosActivas);
-			for (Producto prod : productosVendidos) {
-				carrito.addProduct(prod);
-			}
+			carrito.agregarListaProducto(productosElegidos);
 
 			RegistroVenta venta = carrito.finalizarVenta(tarjeta);
 			em.persist(venta);
@@ -84,15 +81,11 @@ public class VentaServiceJPA implements VentaService {
 
 		try {
 			tx.begin();
-
-			// Crear una query para iterar sobre los productos para no establecer tantas
-			// conexiones a la bd
-			// Armo la lista de productos comprados
-			List<Producto> productosComprados = new ArrayList<>();
-			for (Long idProducto : productosID) {
-				Producto prod = em.find(Producto.class, idProducto);
-				productosComprados.add(prod);
-			}
+			// Armo la lista de productos comprados | query => menor conexiones a la bd
+			TypedQuery<Producto> productosFromList = em
+					.createQuery("select prod from Producto prod where prod.idProducto in :prodIDList", Producto.class);
+			productosFromList.setParameter("prodIDList", productosID);
+			List<Producto> productosElegidos = productosFromList.getResultList();
 
 			// Me cargo las promos activas
 			List<Promocion> promosActivas = new ArrayList<Promocion>();
@@ -105,9 +98,7 @@ public class VentaServiceJPA implements VentaService {
 			CarritoCompra carrito = new CarritoCompra(promosActivas);
 			TarjetaCredito tarjeta = em.find(TarjetaCredito.class, idTarjeta);
 			carrito.setMedioDePago(tarjeta.obtenerEntidadBancaria());
-			for (Producto prod : productosComprados) {
-				carrito.addProduct(prod);
-			}
+			carrito.agregarListaProducto(productosElegidos);
 
 			total = carrito.montoTotal();
 

@@ -61,7 +61,10 @@ public class CarritoCompra {
 
 	public void addProduct(Producto product) {
 		this.productosSeleccionados.add(product);
+	}
 
+	public void agregarListaProducto(List<Producto> listadoProductos) {
+		this.productosSeleccionados = listadoProductos;
 	}
 
 	public Date getFechaCompra() {
