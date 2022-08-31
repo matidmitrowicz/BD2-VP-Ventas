@@ -1,10 +1,13 @@
 package ar.unrn.tp.main;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ar.unrn.tp.jpa.servicios.ClienteServiceJPA;
 import ar.unrn.tp.jpa.servicios.ProductoServiceJPA;
+import ar.unrn.tp.jpa.servicios.VentaServiceJPA;
 import ar.unrn.tp.modelo.Producto;
+import ar.unrn.tp.modelo.RegistroVenta;
 import ar.unrn.tp.modelo.TarjetaCredito;
 
 public class Main {
@@ -36,13 +39,14 @@ public class Main {
 			System.out.println(prod.toString());
 		}
 
-//		List<Long> productosComprados = new ArrayList<>();
-//		productosComprados.add(10L);
-//		productosComprados.add(11L);
-//
-//		VentaServiceJPA servicioVenta = new VentaServiceJPA();
-//		servicioVenta.realizarVenta(1L, productosComprados, 2L);
+		List<Long> productosComprados = new ArrayList<>();
+		productosComprados.add(10L);
+		productosComprados.add(11L);
 
+		VentaServiceJPA servicioVenta = new VentaServiceJPA();
+		servicioVenta.realizarVenta(1L, productosComprados, 2L);
+
+		List<RegistroVenta> ventas = servicioVenta.ventas();
 	}
 
 }
