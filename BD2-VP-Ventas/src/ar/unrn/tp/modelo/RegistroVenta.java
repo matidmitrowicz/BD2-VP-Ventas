@@ -25,13 +25,13 @@ public class RegistroVenta {
 	private double montoTotal;
 
 	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-	private List<Producto> misProductos;
+	private List<ProductoVendido> misProductos;
 
 	protected RegistroVenta() {
 	}
 
 	public RegistroVenta(LocalDate fechaVenta, Cliente cliente, String metodoPago,
-			List<Producto> productosSeleccionados, double montoTotal) {
+			List<ProductoVendido> productosSeleccionados, double montoTotal) {
 		this.fecha = java.sql.Date.valueOf(fechaVenta);
 		this.cliente = cliente;
 		this.metodoPago = metodoPago;
@@ -75,11 +75,11 @@ public class RegistroVenta {
 		this.metodoPago = metodoPago;
 	}
 
-	private List<Producto> getMisProductos() {
+	private List<ProductoVendido> getMisProductos() {
 		return misProductos;
 	}
 
-	private void setMisProductos(List<Producto> misProductos) {
+	private void setMisProductos(List<ProductoVendido> misProductos) {
 		this.misProductos = misProductos;
 	}
 

@@ -46,15 +46,15 @@ public class VentaServiceJPA implements VentaService {
 			promosAll.setParameter("fecha", java.sql.Date.valueOf(LocalDate.now()));
 			promosActivas = promosAll.getResultList();
 
-			// Armo la lista de productos comprados
-			List<Producto> productosComprados = new ArrayList<>();
+			// Armo la lista de productos vendidos
+			List<Producto> productosVendidos = new ArrayList<>();
 			for (Long idProducto : productosID) {
 				Producto prod = em.find(Producto.class, idProducto);
-				productosComprados.add(prod);
+				productosVendidos.add(prod);
 			}
 
 			CarritoCompra carrito = new CarritoCompra(cliente, promosActivas);
-			for (Producto prod : productosComprados) {
+			for (Producto prod : productosVendidos) {
 				carrito.addProduct(prod);
 			}
 
@@ -85,6 +85,8 @@ public class VentaServiceJPA implements VentaService {
 		try {
 			tx.begin();
 
+			// Crear una query para iterar sobre los productos para no establecer tantas
+			// conexiones a la bd
 			// Armo la lista de productos comprados
 			List<Producto> productosComprados = new ArrayList<>();
 			for (Long idProducto : productosID) {

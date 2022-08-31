@@ -126,7 +126,15 @@ public class Producto {
 		this.precio = precio;
 	}
 
-	public Object verMarca() {
+	public String verCodigo() {
+		return this.codigo;
+	}
+
+	public String verDescripcion() {
+		return this.descripcion;
+	}
+
+	public String verMarca() {
 		return this.marcaProducto;
 	}
 

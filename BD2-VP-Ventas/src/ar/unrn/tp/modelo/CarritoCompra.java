@@ -98,7 +98,12 @@ public class CarritoCompra {
 				throw new RuntimeException("La tarjeta no le pertenece al cliente");
 			}
 			tarjeta.debitar(montoTotal());
-			RegistroVenta venta = new RegistroVenta(LocalDate.now(), cliente, getMedioDePago(), productosSeleccionados,
+			List<ProductoVendido> pVendidos = new ArrayList<>();
+			for (Producto producto : productosSeleccionados) {
+				ProductoVendido prodV = new ProductoVendido(producto);
+				pVendidos.add(prodV);
+			}
+			RegistroVenta venta = new RegistroVenta(LocalDate.now(), cliente, getMedioDePago(), pVendidos,
 					montoTotal());
 			return venta;
 		} catch (RuntimeException e) {

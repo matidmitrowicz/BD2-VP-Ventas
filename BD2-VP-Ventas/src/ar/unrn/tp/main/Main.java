@@ -21,20 +21,22 @@ public class Main {
 
 		List<TarjetaCredito> tarjetasCli = clienteService.listarTarjetas(1L);
 		for (TarjetaCredito tjc : tarjetasCli) {
-			System.out.println(tjc.toString());
+			System.out.println("Tarjeta cliente : " + tjc.toString());
 		}
 
 //		DescuentoServiceJPA promoService = new DescuentoServiceJPA();
-//		promoService.crearDescuento("Nike", LocalDate.now(), LocalDate.now().plusDays(10), 0.05);
-//		promoService.crearDescuentoSobreTotal("MemeCard", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5),
+//		promoService.crearDescuento("Nike", LocalDate.now().minusDays(1), LocalDate.now().plusDays(5), 0.05);
+//		promoService.crearDescuentoSobreTotal("MemeCard", LocalDate.now().minusDays(1), LocalDate.now().plusDays(5),
 //				0.05);
 
 		ProductoServiceJPA productService = new ProductoServiceJPA();
 
 //		productService.crearCategoria("Ropa Deportiva");
-//		productService.crearProducto("100", "Pantalon", "Adidas", 500, 9L);
-//		productService.crearProducto("120", "Remera", "Adidas", 500, 9L);
-//		productService.modificarProducto(11L, "3", "Remera algodon", "Nike", 1000, 9L);
+//		productService.crearProducto("50", "Pantalon", "Nike", 1000, 5L); 		//ID6
+//		productService.crearProducto("52", "Remera", "Nike", 1000, 5L);			//ID7
+//		productService.crearProducto("54", "Pantalon", "Adidas", 1000, 5L);		//ID8
+//		productService.crearProducto("56", "Remera", "Adidas", 1000, 5L);		//ID9
+//		productService.modificarProducto(6L, "3", "Pantalon gym", "Nike", 1500, 5L);
 
 		List<Producto> products = productService.listarProductos();
 		for (Producto prod : products) {
@@ -43,7 +45,7 @@ public class Main {
 
 		// Product List
 		List<Long> productos = new ArrayList<Long>();
-		productos.add(14L);
+		productos.add(6L);
 //		productos.add(11L);
 //		for (Long id : productos)
 //			System.out.println(id);
