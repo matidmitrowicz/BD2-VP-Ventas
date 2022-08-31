@@ -17,7 +17,7 @@ public class Main {
 		ClienteServiceJPA clienteService = new ClienteServiceJPA();
 //		clienteService.crearCliente("Juan", "Perez", "1234", "juan@mail.com");
 //		clienteService.modificarCliente(1L, "JuanNuevo", "PerezNuevo", "1234", "juanNuevo@mail.com");
-//		clienteService.agregarTarjeta(1L, "1", "MasterCard", 500, LocalDate.now().plusDays(90));
+//		clienteService.agregarTarjeta(1L, "1", "MasterCard", 3000, LocalDate.now().plusDays(90));
 
 		List<TarjetaCredito> tarjetasCli = clienteService.listarTarjetas(1L);
 		for (TarjetaCredito tjc : tarjetasCli) {
@@ -28,25 +28,34 @@ public class Main {
 //		promoService.crearDescuento("Nike", LocalDate.now(), LocalDate.now().plusDays(10), 0.05);
 //		promoService.crearDescuentoSobreTotal("MemeCard", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5),
 //				0.05);
+
 		ProductoServiceJPA productService = new ProductoServiceJPA();
+
 //		productService.crearCategoria("Ropa Deportiva");
-//		productService.crearProducto("1", "Pantalon", "Nike", 500, 9L);
-//		productService.crearProducto("2", "Remera", "Nike", 500, 9L);
-		productService.modificarProducto(11L, "3", "Remera algodon", "Nike", 1000, 9L);
+//		productService.crearProducto("100", "Pantalon", "Adidas", 500, 9L);
+//		productService.crearProducto("120", "Remera", "Adidas", 500, 9L);
+//		productService.modificarProducto(11L, "3", "Remera algodon", "Nike", 1000, 9L);
 
 		List<Producto> products = productService.listarProductos();
 		for (Producto prod : products) {
 			System.out.println(prod.toString());
 		}
 
-		List<Long> productosComprados = new ArrayList<>();
-		productosComprados.add(10L);
-		productosComprados.add(11L);
+		// Product List
+		List<Long> productos = new ArrayList<Long>();
+		productos.add(14L);
+//		productos.add(11L);
+//		for (Long id : productos)
+//			System.out.println(id);
 
 		VentaServiceJPA servicioVenta = new VentaServiceJPA();
-		servicioVenta.realizarVenta(1L, productosComprados, 2L);
-
+		System.out.println(servicioVenta.calcularMonto(productos, 2L));
+//		servicioVenta.realizarVenta(1L, productos, 2L);
+//
 		List<RegistroVenta> ventas = servicioVenta.ventas();
+		for (RegistroVenta registroVenta : ventas) {
+			System.out.println(registroVenta.toString());
+		}
 	}
 
 }

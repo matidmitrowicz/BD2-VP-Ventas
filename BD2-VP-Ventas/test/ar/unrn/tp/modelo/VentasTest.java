@@ -143,8 +143,9 @@ class VentasTest {
 		LocalDate nowMinus = now.minusDays(1);
 		LocalDate nowPlus = now.plusDays(3);
 		// Cliente
+		TarjetaCredito tarjeta = new TarjetaCredito("123456", "MemeCard", nowPlus, 3500);
 		Cliente mati = new Cliente("matias", "Dmitrowicz", "123", "mati@gmail.com");
-		mati.agregarTarjeta(new TarjetaCredito("123456", "MemeCard", nowPlus, 10000));
+		mati.agregarTarjeta(tarjeta);
 		// Carrito
 		CarritoCompra miCarrito = new CarritoCompra(mati, now.plusDays(1));
 		miCarrito.addProduct(prod1);
@@ -158,12 +159,12 @@ class VentasTest {
 		 * * Total 2000 * La tarjeta "MemeCard" del cliente esta activa y tiene
 		 * suficiente para pagar
 		 */
-		assertEquals(2000, miCarrito.pagarCarrito("MemeCard").getMontoTotal());
+		assertEquals(2000, miCarrito.finalizarVenta(tarjeta).getMontoTotal());
 
 		Promocion promoMarcaComarca = new PromocionMarcaProducto(nowMinus, now.plusDays(3), 0.5, "Comarca");
 		promos.add(promoMarcaComarca);
 
-		assertEquals(1500, miCarrito.pagarCarrito("MemeCard").getMontoTotal());
+		assertEquals(1500, miCarrito.finalizarVenta(tarjeta).getMontoTotal());
 	}
 
 	@Test

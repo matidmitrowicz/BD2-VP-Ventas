@@ -6,8 +6,10 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -16,14 +18,13 @@ public class RegistroVenta {
 	@Id
 	@GeneratedValue
 	private Long idVenta;
-
 	private Date fecha;
-
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Cliente cliente;
 	private String metodoPago;
 	private double montoTotal;
 
-	@OneToMany(cascade = CascadeType.PERSIST)
+	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
 	private List<Producto> misProductos;
 
 	protected RegistroVenta() {
@@ -50,10 +51,46 @@ public class RegistroVenta {
 		return montoTotal;
 	}
 
+	private Long getIdVenta() {
+		return idVenta;
+	}
+
+	private void setIdVenta(Long idVenta) {
+		this.idVenta = idVenta;
+	}
+
+	private Cliente getCliente() {
+		return cliente;
+	}
+
+	private void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	private String getMetodoPago() {
+		return metodoPago;
+	}
+
+	private void setMetodoPago(String metodoPago) {
+		this.metodoPago = metodoPago;
+	}
+
+	private List<Producto> getMisProductos() {
+		return misProductos;
+	}
+
+	private void setMisProductos(List<Producto> misProductos) {
+		this.misProductos = misProductos;
+	}
+
+	private void setMontoTotal(double montoTotal) {
+		this.montoTotal = montoTotal;
+	}
+
 	@Override
 	public String toString() {
-		return "RegistroVenta [fecha=" + fecha + ", cliente=" + cliente + ", metodoPago=" + metodoPago
-				+ ", misProductos=" + misProductos + ", montoTotal=" + montoTotal + "]";
+		return "RegistroVenta [idVenta=" + idVenta + ", fecha=" + fecha + ", cliente=" + cliente + ", metodoPago="
+				+ metodoPago + ", montoTotal=" + montoTotal + ", misProductos=" + misProductos + "]";
 	}
 
 }

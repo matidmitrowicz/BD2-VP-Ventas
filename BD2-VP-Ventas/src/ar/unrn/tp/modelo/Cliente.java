@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -21,7 +22,7 @@ public class Cliente {
 	private String dni;
 	private String email;
 
-	@OneToMany(cascade = CascadeType.PERSIST)
+	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
 	private List<TarjetaCredito> tarjetas;
 
 	protected Cliente() {
@@ -104,22 +105,12 @@ public class Cliente {
 		TarjetaCredito tarjeta = null;
 
 		for (TarjetaCredito tarjetaCredito : tarjetas) {
-			if (tarjetaCredito.getEntidadBancaria().equals(metodoPago)) {
+			if (tarjetaCredito.obtenerEntidadBancaria().equals(metodoPago)) {
 				tarjeta = tarjetaCredito;
 			}
 		}
 
 		return tarjeta;
-	}
-
-	public TarjetaCredito getTarjetaByID(Long idTarjeta) {
-		for (TarjetaCredito tarjetaCliente : tarjetas) {
-			if (tarjetaCliente.getIdCobrable().equals(idTarjeta)) {
-				return tarjetaCliente;
-			}
-		}
-
-		throw new RuntimeException("El cliente no posee la tarjeta");
 	}
 
 	private Long getId() {
@@ -177,6 +168,12 @@ public class Cliente {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "Cliente [id=" + id + ", nombre=" + nombre + ", apellido=" + apellido + ", dni=" + dni + ", email="
+				+ email + ", tarjetas=" + tarjetas + "]";
 	}
 
 }

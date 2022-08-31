@@ -21,9 +21,18 @@ public class CarritoCompra {
 		this.promociones = new ArrayList<Promocion>();
 	}
 
+	public CarritoCompra(Cliente cliente, List<Promocion> promociones) {
+		super();
+		this.cliente = cliente;
+		this.setFechaCompra(java.sql.Date.valueOf(LocalDate.now()));
+		this.productosSeleccionados = new ArrayList<Producto>();
+		this.promociones = promociones;
+	}
+
 	public CarritoCompra(List<Promocion> promociones) {
 		this.promociones = promociones;
 		this.setFechaCompra(java.sql.Date.valueOf(LocalDate.now()));
+		this.productosSeleccionados = new ArrayList<Producto>();
 	}
 
 	public List<Producto> getProductosSeleccionados() {
@@ -82,34 +91,19 @@ public class CarritoCompra {
 		return total - this.calcularDescuento();
 	}
 
-	public RegistroVenta pagarCarrito(String metodoPago) {
+	public RegistroVenta finalizarVenta(TarjetaCredito tarjeta) {
 		try {
-			setMedioDePago(metodoPago);
-			TarjetaCredito tarjeta = getCliente().obtenerTarjetaEntidad(medioDePago);
+			setMedioDePago(tarjeta.obtenerEntidadBancaria());
+			if (!cliente.tarjetaValida(tarjeta)) {
+				throw new RuntimeException("La tarjeta no le pertenece al cliente");
+			}
 			tarjeta.debitar(montoTotal());
-			RegistroVenta venta = new RegistroVenta(LocalDate.now(), cliente, metodoPago, productosSeleccionados,
+			RegistroVenta venta = new RegistroVenta(LocalDate.now(), cliente, getMedioDePago(), productosSeleccionados,
 					montoTotal());
 			return venta;
 		} catch (RuntimeException e) {
 			throw e;
 		}
 	}
-
-//	public void pagarCarrito2(String metodoPago) {
-//		try {
-//			setMedioDePago(metodoPago);
-//			TarjetaCredito tarjeta = getCliente().getTarjeta(metodoPago);
-//			System.out.println(tarjeta);
-//			System.out.println(montoTotal());
-//			System.out.println(cliente);
-//			System.out.println(metodoPago);
-//			System.out.println(tarjeta.getMontoTotalAGastar());
-//			tarjeta.debitar(montoTotal());
-//			System.out.println(tarjeta.getMontoTotalAGastar());
-//
-//		} catch (RuntimeException e) {
-//			throw e;
-//		}
-//	}
 
 }

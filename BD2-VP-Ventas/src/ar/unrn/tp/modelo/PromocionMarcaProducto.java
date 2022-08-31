@@ -42,4 +42,10 @@ public class PromocionMarcaProducto extends Promocion {
 		this.marcaEnDescuento = marcaEnDescuento;
 	}
 
+	@Override
+	public String toString() {
+		return "PromocionMarcaProducto [marcaEnDescuento=" + marcaEnDescuento + ", idPromocion=" + idPromocion
+				+ ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", descuento=" + descuento + "]";
+	}
+
 }

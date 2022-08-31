@@ -43,4 +43,10 @@ public class PromocionMedioDePago extends Promocion {
 		this.promoMedioDePago = promoMedioDePago;
 	}
 
+	@Override
+	public String toString() {
+		return "PromocionMedioDePago [promoMedioDePago=" + promoMedioDePago + ", idPromocion=" + idPromocion
+				+ ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", descuento=" + descuento + "]";
+	}
+
 }

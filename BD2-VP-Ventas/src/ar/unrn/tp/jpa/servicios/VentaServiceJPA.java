@@ -21,12 +21,13 @@ import ar.unrn.tp.modelo.TarjetaCredito;
 public class VentaServiceJPA implements VentaService {
 
 	@Override
-	public void realizarVenta(Long idCliente, List<Long> productos, Long idTarjeta) {
+	public void realizarVenta(Long idCliente, List<Long> productosID, Long idTarjeta) {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
+
 			// Validar cliente y tarjeta
 			Cliente cliente = em.find(Cliente.class, idCliente);
 			TarjetaCredito tarjeta = em.find(TarjetaCredito.class, idTarjeta);
@@ -34,26 +35,30 @@ public class VentaServiceJPA implements VentaService {
 				throw new RuntimeException("La tarjeta no le pertenece al cliente");
 			}
 			// Lista de productos no vacia
-			if (productos == null || productos.size() == 0) {
+			if (productosID == null || productosID.size() == 0) {
 				throw new RuntimeException("No se agrego ningun producto.");
 			}
-			// Genero la configuracion para la venta
-			List<Promocion> promos = new ArrayList<Promocion>();
-			TypedQuery<Promocion> promosBD = em.createQuery("select p from Promocion p", Promocion.class);
-			promos = promosBD.getResultList();
 
-			CarritoCompra carrito = new CarritoCompra(cliente, LocalDate.now());
-			carrito.agregarPromo(promos);
+			// Me cargo las promos activas
+			List<Promocion> promosActivas = new ArrayList<Promocion>();
+			TypedQuery<Promocion> promosAll = em.createQuery(
+					"select p from Promocion p where :fecha between p.fechaInicio and p.fechaFin", Promocion.class);
+			promosAll.setParameter("fecha", java.sql.Date.valueOf(LocalDate.now()));
+			promosActivas = promosAll.getResultList();
 
-			Producto prod = null;
-			for (Long idProducto : productos) {
-				prod = em.find(Producto.class, idProducto);
+			// Armo la lista de productos comprados
+			List<Producto> productosComprados = new ArrayList<>();
+			for (Long idProducto : productosID) {
+				Producto prod = em.find(Producto.class, idProducto);
+				productosComprados.add(prod);
+			}
+
+			CarritoCompra carrito = new CarritoCompra(cliente, promosActivas);
+			for (Producto prod : productosComprados) {
 				carrito.addProduct(prod);
 			}
-			double totalVenta = calcularMonto(productos, idTarjeta);
-			// El monto lo saco del carrito o de la funcion calcularMonto del servicio ?
-			RegistroVenta venta = new RegistroVenta(LocalDate.now(), cliente, tarjeta.getEntidadBancaria(),
-					carrito.getProductosSeleccionados(), totalVenta);
+
+			RegistroVenta venta = carrito.finalizarVenta(tarjeta);
 			em.persist(venta);
 
 			tx.commit();
@@ -70,7 +75,7 @@ public class VentaServiceJPA implements VentaService {
 	}
 
 	@Override
-	public double calcularMonto(List<Long> productos, Long idTarjeta) {
+	public double calcularMonto(List<Long> productosID, Long idTarjeta) {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
@@ -80,20 +85,28 @@ public class VentaServiceJPA implements VentaService {
 		try {
 			tx.begin();
 
+			// Armo la lista de productos comprados
+			List<Producto> productosComprados = new ArrayList<>();
+			for (Long idProducto : productosID) {
+				Producto prod = em.find(Producto.class, idProducto);
+				productosComprados.add(prod);
+			}
+
+			// Me cargo las promos activas
+			List<Promocion> promosActivas = new ArrayList<Promocion>();
+			TypedQuery<Promocion> promosAll = em.createQuery(
+					"select p from Promocion p where :fecha between p.fechaInicio and p.fechaFin", Promocion.class);
+			promosAll.setParameter("fecha", java.sql.Date.valueOf(LocalDate.now()));
+			promosActivas = promosAll.getResultList();
+
+			// Armo el carrito con las promos+tarjeta+productos
+			CarritoCompra carrito = new CarritoCompra(promosActivas);
 			TarjetaCredito tarjeta = em.find(TarjetaCredito.class, idTarjeta);
-
-			List<Promocion> promos = new ArrayList<Promocion>();
-			TypedQuery<Promocion> promosBD = em.createQuery("select p from Promocion p", Promocion.class);
-			promos = promosBD.getResultList();
-
-			CarritoCompra carrito = new CarritoCompra(promos);
-			carrito.setMedioDePago(tarjeta.getEntidadBancaria());
-			Producto prod = null;
-
-			for (Long idProducto : productos) {
-				prod = em.find(Producto.class, idProducto);
+			carrito.setMedioDePago(tarjeta.obtenerEntidadBancaria());
+			for (Producto prod : productosComprados) {
 				carrito.addProduct(prod);
 			}
+
 			total = carrito.montoTotal();
 
 			tx.commit();
@@ -114,9 +127,7 @@ public class VentaServiceJPA implements VentaService {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
-
 		List<RegistroVenta> ventas = new ArrayList<RegistroVenta>();
-
 		try {
 			tx.begin();
 
