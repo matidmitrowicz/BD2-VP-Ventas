@@ -2,10 +2,13 @@ package ar.unrn.tp.modelo;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
+@DiscriminatorValue(value = "Marca")
 public class PromocionMarcaProducto extends Promocion {
 
 	private String marcaEnDescuento;
@@ -44,8 +47,14 @@ public class PromocionMarcaProducto extends Promocion {
 
 	@Override
 	public String toString() {
-		return "PromocionMarcaProducto [marcaEnDescuento=" + marcaEnDescuento + ", idPromocion=" + idPromocion
-				+ ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", descuento=" + descuento + "]";
+		return "PromocionMarcaProducto [marcaEnDescuento=" + marcaEnDescuento + ", idPromocion=" + id + ", fechaInicio="
+				+ fechaInicio + ", fechaFin=" + fechaFin + ", descuento=" + descuento + "]";
+	}
+
+	@Override
+	public Map<String, Object> toMap() {
+		return Map.of("id", this.id, "fechaInicio", this.fechaInicio.toString(), "fechaFin", this.fechaFin.toString(),
+				"descuento", this.descuento, "tipoDescuento", this.marcaEnDescuento);
 	}
 
 }

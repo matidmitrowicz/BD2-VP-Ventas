@@ -1,17 +1,26 @@
 package ar.unrn.tp.modelo;
 
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Map;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "tarjetas_credito")
 public class TarjetaCredito {
 
 	@Id
-	@GeneratedValue
+	@Column(name = "tarjeta_id")
+//	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected Long id;
 
 	private String numeroTarjeta;
@@ -56,8 +65,9 @@ public class TarjetaCredito {
 		return entidadBancaria;
 	}
 
-	public Date obtenerFechaVencimiento() {
-		return fechaVencimiento;
+	public String obtenerFechaVencimiento() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		return dateFormat.format(fechaVencimiento);
 	}
 
 	public double obtenerSaldoDisponible() {
@@ -108,6 +118,11 @@ public class TarjetaCredito {
 	public String toString() {
 		return "TarjetaCredito [numeroTarjeta=" + numeroTarjeta + ", entidadBancaria=" + entidadBancaria
 				+ ", fechaVencimiento=" + fechaVencimiento + ", montoTotalAGastar=" + montoTotalAGastar + "]";
+	}
+
+	public Map<String, Object> toMap() {
+		return Map.of("id", id, "numero", numeroTarjeta, "entidadBancaria", entidadBancaria, "fechaVencimiento",
+				obtenerFechaVencimiento(), "saldo", montoTotalAGastar);
 	}
 
 }

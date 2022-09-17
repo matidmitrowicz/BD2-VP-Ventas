@@ -15,9 +15,15 @@ import ar.unrn.tp.modelo.Producto;
 
 public class ProductoServiceJPA implements ProductoService {
 
+	private String persistence;
+
+	public ProductoServiceJPA(String persistence) {
+		this.persistence = persistence;
+	}
+
 	@Override
 	public void crearProducto(String codigo, String descripcion, String marca, double precio, Long IdCategoría) {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -54,7 +60,7 @@ public class ProductoServiceJPA implements ProductoService {
 	@Override
 	public void modificarProducto(Long idProducto, String codigo, String descripcion, String marca, double precio,
 			Long IdCategoría) {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -84,7 +90,7 @@ public class ProductoServiceJPA implements ProductoService {
 
 	@Override
 	public List<Producto> listarProductos() {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 
@@ -111,7 +117,7 @@ public class ProductoServiceJPA implements ProductoService {
 
 	@Override
 	public void crearCategoria(String nombre) {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {

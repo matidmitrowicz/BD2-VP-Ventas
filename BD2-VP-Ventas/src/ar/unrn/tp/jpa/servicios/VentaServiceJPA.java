@@ -20,9 +20,15 @@ import ar.unrn.tp.modelo.TarjetaCredito;
 
 public class VentaServiceJPA implements VentaService {
 
+	private String persistence;
+
+	public VentaServiceJPA(String persistence) {
+		this.persistence = persistence;
+	}
+
 	@Override
 	public void realizarVenta(Long idCliente, List<Long> productosID, Long idTarjeta) {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -73,7 +79,7 @@ public class VentaServiceJPA implements VentaService {
 
 	@Override
 	public double calcularMonto(List<Long> productosID, Long idTarjeta) {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 
@@ -81,6 +87,10 @@ public class VentaServiceJPA implements VentaService {
 
 		try {
 			tx.begin();
+			TarjetaCredito tarjeta = em.find(TarjetaCredito.class, idTarjeta);
+			if (tarjeta == null) {
+				throw new RuntimeException("Tarjeta no valida.");
+			}
 			// Armo la lista de productos comprados | query => menor conexiones a la bd
 			TypedQuery<Producto> productosFromList = em
 					.createQuery("select prod from Producto prod where prod.idProducto in :prodIDList", Producto.class);
@@ -96,7 +106,7 @@ public class VentaServiceJPA implements VentaService {
 
 			// Armo el carrito con las promos+tarjeta+productos
 			CarritoCompra carrito = new CarritoCompra(promosActivas);
-			TarjetaCredito tarjeta = em.find(TarjetaCredito.class, idTarjeta);
+//			TarjetaCredito tarjeta = em.find(TarjetaCredito.class, idTarjeta);
 			carrito.setMedioDePago(tarjeta.obtenerEntidadBancaria());
 			carrito.agregarListaProducto(productosElegidos);
 
@@ -117,7 +127,7 @@ public class VentaServiceJPA implements VentaService {
 
 	@Override
 	public List<RegistroVenta> ventas() {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		List<RegistroVenta> ventas = new ArrayList<RegistroVenta>();

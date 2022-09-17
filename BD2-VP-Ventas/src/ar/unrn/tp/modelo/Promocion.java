@@ -3,16 +3,23 @@ package ar.unrn.tp.modelo;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 
 @Entity
+@DiscriminatorColumn(name = "tipo")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Promocion {
 	@Id
-	@GeneratedValue
-	protected Long idPromocion;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	protected Long id;
 
 	protected Date fechaInicio;
 	protected Date fechaFin;
@@ -42,6 +49,8 @@ public abstract class Promocion {
 
 	public abstract double devolverMontoDescontado(List<Producto> productos, String metodoPago);
 
+	public abstract Map<String, Object> toMap();
+
 	public double getDescuento() {
 		return descuento;
 	}
@@ -51,11 +60,11 @@ public abstract class Promocion {
 	}
 
 	private Long getIdPromocion() {
-		return idPromocion;
+		return id;
 	}
 
 	private void setIdPromocion(Long idPromocion) {
-		this.idPromocion = idPromocion;
+		this.id = idPromocion;
 	}
 
 	private Date getFechaInicio() {

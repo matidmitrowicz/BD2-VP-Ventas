@@ -23,6 +23,9 @@ public class CarritoCompra {
 
 	public CarritoCompra(Cliente cliente, List<Promocion> promociones) {
 		super();
+		if (cliente == null) {
+			throw new RuntimeException("Missing client");
+		}
 		this.cliente = cliente;
 		this.setFechaCompra(java.sql.Date.valueOf(LocalDate.now()));
 		this.productosSeleccionados = new ArrayList<Producto>();

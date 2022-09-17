@@ -1,14 +1,19 @@
 package ar.unrn.tp.modelo;
 
+import java.util.Map;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
 public class ProductoVendido {
 
 	@Id
-	@GeneratedValue
+	@Column(name = "producto_id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	private String codigo;
@@ -72,6 +77,11 @@ public class ProductoVendido {
 	public String toString() {
 		return "ProductoVendido [id=" + id + ", codigo=" + codigo + ", descripcion=" + descripcion + ", marcaProducto="
 				+ marcaProducto + ", precio=" + precio + "]";
+	}
+
+	public Map<String, Object> toMap() {
+		return Map.of("idProducto", id, "codigo", codigo, "descripcion", descripcion, "marca", marcaProducto, "precio",
+				precio);
 	}
 
 }

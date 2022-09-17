@@ -16,10 +16,16 @@ import ar.unrn.tp.modelo.TarjetaCredito;
 
 public class ClienteServiceJPA implements ClienteService {
 
+	private String persistence;
+
+	public ClienteServiceJPA(String persistence) {
+		this.persistence = persistence;
+	}
+
 	@Override
 	public void crearCliente(String nombre, String apellido, String dni, String email) {
 
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -50,7 +56,7 @@ public class ClienteServiceJPA implements ClienteService {
 
 	@Override
 	public void modificarCliente(Long idCliente, String nombre, String apellido, String dni, String email) {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -77,7 +83,7 @@ public class ClienteServiceJPA implements ClienteService {
 
 	@Override
 	public void agregarTarjeta(Long idCliente, String nro, String marca, double saldo, LocalDate fechaVencimiento) {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -104,7 +110,7 @@ public class ClienteServiceJPA implements ClienteService {
 
 	@Override
 	public List<TarjetaCredito> listarTarjetas(Long idCliente) {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-objectdb");
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 

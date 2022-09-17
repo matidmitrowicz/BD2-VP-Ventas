@@ -1,23 +1,30 @@
 package ar.unrn.tp.modelo;
 
+import java.util.Map;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class Producto {
 	@Id
-	@GeneratedValue
+	@Column(name = "producto_id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long idProducto;
 
 	private String codigo;
 	private String descripcion;
 	private String marcaProducto;
-	@ManyToOne(fetch = FetchType.EAGER)
-	private Categoria categoria;
 	private double precio;
+	@ManyToOne(fetch = FetchType.EAGER) // @ManyToOne > un producto una categoria
+	@JoinColumn(name = "categoria_id")
+	private Categoria categoria;
 
 	protected Producto() {
 
@@ -140,6 +147,11 @@ public class Producto {
 
 	public double obtenerPrecio() {
 		return this.precio;
+	}
+
+	public Map<String, Object> toMap() {
+		return Map.of("idProducto", idProducto, "codigo", codigo, "descripcion", descripcion, "marca", marcaProducto,
+				"precio", precio, "categoria", categoria.toMap());
 	}
 
 	@Override

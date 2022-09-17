@@ -4,17 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
+@Table(name = "cliente")
 public class Cliente {
 
 	@Id
-	@GeneratedValue
+	@Column(name = "cliente_id")
+	@GeneratedValue(strategy = GenerationType.AUTO) // @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private String nombre;
@@ -22,11 +31,13 @@ public class Cliente {
 	private String dni;
 	private String email;
 
-	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER) // @OneToMany > un cliente muchas tarjetas -
+	@JoinColumn(name = "cliente_id")
+	// cannot simultaneously fetch multiple bags:
+	@Fetch(value = FetchMode.SUBSELECT)
 	private List<TarjetaCredito> tarjetas;
 
 	protected Cliente() {
-
 	}
 
 	public Cliente(String nombre, String apellido, String dni, String email) {
@@ -174,6 +185,10 @@ public class Cliente {
 	public String toString() {
 		return "Cliente [id=" + id + ", nombre=" + nombre + ", apellido=" + apellido + ", dni=" + dni + ", email="
 				+ email + ", tarjetas=" + tarjetas + "]";
+	}
+
+	public Long getClientId() {
+		return this.id;
 	}
 
 }
