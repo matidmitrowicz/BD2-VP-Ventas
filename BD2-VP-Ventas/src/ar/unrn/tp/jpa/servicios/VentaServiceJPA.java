@@ -1,18 +1,22 @@
 package ar.unrn.tp.jpa.servicios;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import ar.unrn.tp.api.VentaService;
 import ar.unrn.tp.modelo.CarritoCompra;
 import ar.unrn.tp.modelo.Cliente;
+import ar.unrn.tp.modelo.NumberYearVenta;
 import ar.unrn.tp.modelo.Producto;
 import ar.unrn.tp.modelo.Promocion;
 import ar.unrn.tp.modelo.RegistroVenta;
@@ -62,7 +66,32 @@ public class VentaServiceJPA implements VentaService {
 			carrito.agregarListaProducto(productosElegidos);
 
 			RegistroVenta venta = carrito.finalizarVenta(tarjeta);
+
+			// Manejar la concurrencia con SELECT FOR UPDATE EN JPA --> PESSIMISTIC_WRITE
+
+			LocalDateTime currentDate = LocalDateTime.now();
+			int currentYear = currentDate.getYear();
+
+			TypedQuery<NumberYearVenta> query = em.createQuery("from NumberYearVenta where year = :currentYear",
+					NumberYearVenta.class);
+			query.setParameter("currentYear", currentYear);
+			query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+
+			// Me devuelve algo -> uso el result, sino devuelvo nada -> nueva instacia
+
+			NumberYearVenta naVenta = null;
+			try {
+				naVenta = query.getSingleResult();
+			} catch (NoResultException e) {
+				naVenta = new NumberYearVenta(); // Sin resultados --> nueva instancia
+			}
+
+			System.out.println("N-YYYY venta : " + naVenta.formatoNumYear());
+			venta.setNumberYearFormat(naVenta.formatoNumYear()); // N-YYYY
+
 			em.persist(venta);
+			naVenta.nextValue();
+			em.persist(naVenta);
 
 			tx.commit();
 		} catch (Exception e) {
@@ -106,7 +135,6 @@ public class VentaServiceJPA implements VentaService {
 
 			// Armo el carrito con las promos+tarjeta+productos
 			CarritoCompra carrito = new CarritoCompra(promosActivas);
-//			TarjetaCredito tarjeta = em.find(TarjetaCredito.class, idTarjeta);
 			carrito.setMedioDePago(tarjeta.obtenerEntidadBancaria());
 			carrito.agregarListaProducto(productosElegidos);
 

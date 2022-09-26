@@ -2,6 +2,8 @@ package ar.unrn.tp.api;
 
 import java.util.List;
 
+import ar.unrn.tp.excepciones.UpdateInProcessException;
+import ar.unrn.tp.modelo.Categoria;
 import ar.unrn.tp.modelo.Producto;
 
 public interface ProductoService {
@@ -11,11 +13,13 @@ public interface ProductoService {
 
 	// validar que sea un producto existente
 	void modificarProducto(Long idProducto, String codigo, String descripcion, String marca, double precio,
-			Long IdCategoría);
+			Long IdCategoría, Long version) throws UpdateInProcessException;
 
 	// Devuelve todos los productos
 	List<Producto> listarProductos();
 
 	void crearCategoria(String nombre);
+
+	List<Categoria> listarCategorias();
 
 }

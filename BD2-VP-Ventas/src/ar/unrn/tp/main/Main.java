@@ -25,6 +25,13 @@ public class Main {
 		WebAPI api = new WebAPI(clienteService, productService, promoService, servicioVenta, 1234);
 		api.start();
 
+//		var productos = productService.listarProductos();
+//		var list = new ArrayList<Map<String, Object>>();
+//		for (Producto p : productos) {
+//			list.add(p.toMap());
+//		}
+//		System.out.println(list);
+
 //		clienteService.crearCliente("Juan", "Perez", "1234", "juan@mail.com");
 //		clienteService.modificarCliente(1L, "JuanNuevo", "PerezNuevo", "1234", "juanNuevo@mail.com");
 //		clienteService.agregarTarjeta(1L, "100", "MemeCard", 5000, LocalDate.now().plusDays(90));
@@ -45,6 +52,7 @@ public class Main {
 
 //
 //		productService.crearCategoria("Ropa Deportiva");
+//		productService.crearCategoria("Calzado");
 //		productService.crearProducto("50", "Pantalon", "Nike", 500, 2L); // ID6
 //		productService.crearProducto("52", "Remera", "Nike", 500, 2L); // ID7
 //		productService.crearProducto("54", "Pantalon", "Adidas", 500, 2L); // ID8
@@ -68,10 +76,17 @@ public class Main {
 //		servicioVenta.realizarVenta(1L, productos, 1L);
 //
 //		java.util.List<RegistroVenta> ventas = servicioVenta.ventas();
+//		var list = new ArrayList<Map<String, Object>>();
+//		for (RegistroVenta v : ventas) {
+//			System.out.println(list.add(v.toMap()));
+//		}
+//		for (Map<String, Object> map : list) {
+//			System.out.println(map);
+//		}
+
 //		for (RegistroVenta registroVenta : ventas) {
 //			System.out.println(registroVenta.toString());
 //		}
 
 	}
-
 }

@@ -6,10 +6,12 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import ar.unrn.tp.api.ProductoService;
+import ar.unrn.tp.excepciones.UpdateInProcessException;
 import ar.unrn.tp.modelo.Categoria;
 import ar.unrn.tp.modelo.Producto;
 
@@ -59,23 +61,25 @@ public class ProductoServiceJPA implements ProductoService {
 
 	@Override
 	public void modificarProducto(Long idProducto, String codigo, String descripcion, String marca, double precio,
-			Long IdCategoría) {
+			Long IdCategoría, Long version) throws UpdateInProcessException {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 		EntityManager em = emf.createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
-			Categoria categoria = em.getReference(Categoria.class, IdCategoría);
-			Producto producto = em.getReference(Producto.class, idProducto);
 
+			Categoria categoria = em.find(Categoria.class, IdCategoría);
+			Producto producto = new Producto(codigo, descripcion, marca, categoria, precio);
 			producto.cambiarID(idProducto);
-			producto.cambiarCodigo(codigo);
-			producto.cambiarDescripcion(descripcion);
-			producto.cambiarMarca(marca);
-			producto.cambiarPrecio(precio);
-			producto.cambiarCategoria(categoria);
+			producto.versionUpdate(version);
+
+			em.merge(producto);
 
 			tx.commit();
+
+		} catch (OptimisticLockException e) {
+			throw new UpdateInProcessException(
+					"El producto fue modificado recientemente.. Refresque la pagina para ver los nuevos datos.");
 		} catch (Exception e) {
 			tx.rollback();
 			throw new RuntimeException(e);
@@ -146,6 +150,33 @@ public class ProductoServiceJPA implements ProductoService {
 				emf.close();
 		}
 
+	}
+
+	@Override
+	public List<Categoria> listarCategorias() {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
+		EntityManager em = emf.createEntityManager();
+		EntityTransaction tx = em.getTransaction();
+
+		List<Categoria> categorias = new ArrayList<Categoria>();
+		try {
+			tx.begin();
+
+			TypedQuery<Categoria> query = em.createQuery("select c from Categoria c", Categoria.class);
+
+			categorias = query.getResultList();
+
+			tx.commit();
+		} catch (Exception e) {
+			tx.rollback();
+			throw new RuntimeException(e);
+		} finally {
+			if (em != null && em.isOpen())
+				em.close();
+			if (emf != null)
+				emf.close();
+		}
+		return categorias;
 	}
 
 }

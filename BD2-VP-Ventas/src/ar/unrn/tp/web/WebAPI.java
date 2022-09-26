@@ -8,6 +8,8 @@ import ar.unrn.tp.api.ClienteService;
 import ar.unrn.tp.api.DescuentoService;
 import ar.unrn.tp.api.ProductoService;
 import ar.unrn.tp.api.VentaService;
+import ar.unrn.tp.excepciones.UpdateInProcessException;
+import ar.unrn.tp.modelo.Categoria;
 import ar.unrn.tp.modelo.Producto;
 import ar.unrn.tp.modelo.Promocion;
 import ar.unrn.tp.modelo.RegistroVenta;
@@ -39,16 +41,51 @@ public class WebAPI {
 		app.get("/productos", traerProductos());
 		app.get("/tarjetas/{id}", traerTarjetas());
 		app.get("/descuentos", traerPromocionesActivas());
-
 		app.post("/monto", calcularMonto());
 		app.post("/compra", realizarCompra());
+		app.post("/productUpdate", productUpdate()); // modifica el producto
 
+		app.get("/updateProducto", productoModificable()); // retorna un producto y categorias
 		app.get("/ventas", traerVentas());
+
+		app.exception(UpdateInProcessException.class, (e, ctx) -> {
+			ctx.json(Map.of("result", "error", "message", e.getMessage()));
+		});
 
 		app.exception(Exception.class, (e, ctx) -> {
 			ctx.json(Map.of("result", "error", "message", "Ups... algo se rompió.: " + e.getMessage()));
 			// log error in a stream...
 		});
+	}
+
+	private Handler productUpdate() {
+		return ctx -> {
+			ProductoDTO dto = ctx.bodyAsClass(ProductoDTO.class);
+
+			this.productos.modificarProducto(Long.parseLong(dto.getIdProducto()), dto.getCodigo(), dto.getDescripcion(),
+					dto.getMarca(), Double.parseDouble(dto.getPrecio()), Long.parseLong(dto.getCategoria()),
+					Long.parseLong(dto.getVersion()));
+
+			ctx.json(Map.of("result", "success", "message", "Producto actualizado"));
+
+		};
+	}
+
+	private Handler productoModificable() {
+		return ctx -> {
+			var productos = this.productos.listarProductos();
+			var categorias = this.productos.listarCategorias();
+
+			var listaCategorias = new ArrayList<Map<String, Object>>();
+
+			for (Categoria c : categorias) {
+				listaCategorias.add(c.toMap());
+			}
+
+			Producto p = productos.get(0); // primer producto de la bd
+
+			ctx.json(Map.of("result", "success", "producto", p.toMap(), "categorias", listaCategorias));
+		};
 	}
 
 	private Handler traerProductos() {

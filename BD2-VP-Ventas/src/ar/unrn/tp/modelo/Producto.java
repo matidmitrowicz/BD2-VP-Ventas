@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 @Entity
 public class Producto {
@@ -25,6 +26,9 @@ public class Producto {
 	@ManyToOne(fetch = FetchType.EAGER) // @ManyToOne > un producto una categoria
 	@JoinColumn(name = "categoria_id")
 	private Categoria categoria;
+
+	@Version
+	private Long version;
 
 	protected Producto() {
 
@@ -133,6 +137,14 @@ public class Producto {
 		this.precio = precio;
 	}
 
+	private Long getVersion() {
+		return version;
+	}
+
+	private void setVersion(Long version) {
+		this.version = version;
+	}
+
 	public String verCodigo() {
 		return this.codigo;
 	}
@@ -149,15 +161,20 @@ public class Producto {
 		return this.precio;
 	}
 
+	public void versionUpdate(Long version) {
+		this.version = version;
+	}
+
 	public Map<String, Object> toMap() {
 		return Map.of("idProducto", idProducto, "codigo", codigo, "descripcion", descripcion, "marca", marcaProducto,
-				"precio", precio, "categoria", categoria.toMap());
+				"precio", precio, "categoria", categoria.toMap(), "version", version);
 	}
 
 	@Override
 	public String toString() {
-		return "Producto [idProducto=" + idProducto + ", codigo=" + codigo + ", descripcion=" + descripcion
-				+ ", marcaProducto=" + marcaProducto + ", categoria=" + categoria + ", precio=" + precio + "]";
+		return "Producto [idProducto=" + idProducto + ", codigo=" + codigo + ", version=" + version + ", descripcion="
+				+ descripcion + ", marcaProducto=" + marcaProducto + ", categoria=" + categoria + ", precio=" + precio
+				+ "]";
 	}
 
 }
