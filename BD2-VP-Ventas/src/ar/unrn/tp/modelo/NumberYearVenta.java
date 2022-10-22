@@ -53,4 +53,9 @@ public class NumberYearVenta {
 		this.year = year;
 	}
 
+	@Override
+	public String toString() {
+		return "NumberYearVenta [number=" + number + ", year=" + year + "]";
+	}
+
 }

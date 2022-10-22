@@ -13,6 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import ar.unrn.tp.excepciones.DebitarCardException;
+
 @Entity
 @Table(name = "tarjetas_credito")
 public class TarjetaCredito {
@@ -49,11 +51,11 @@ public class TarjetaCredito {
 		return this.fechaVencimiento.after(java.sql.Date.valueOf(LocalDate.now()));
 	}
 
-	public void debitar(double monto) {
+	public void debitar(double monto) throws DebitarCardException {
 		if (estaActiva() && validarFondos(monto)) {
 			this.montoTotalAGastar -= monto;
 		} else {
-			throw new RuntimeException("Tarjeta inactiva o saldo insuficiente");
+			throw new DebitarCardException("Tarjeta inactiva o saldo insuficiente");
 		}
 	}
 

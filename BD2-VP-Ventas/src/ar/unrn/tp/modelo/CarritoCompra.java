@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.unrn.tp.excepciones.DebitarCardException;
+
 public class CarritoCompra {
 
 	private List<Producto> productosSeleccionados;
@@ -36,6 +38,14 @@ public class CarritoCompra {
 		this.promociones = promociones;
 		this.setFechaCompra(java.sql.Date.valueOf(LocalDate.now()));
 		this.productosSeleccionados = new ArrayList<Producto>();
+	}
+
+	private boolean esDatoVacio(String dato) {
+		return dato.equals("");
+	}
+
+	private boolean esDatoNulo(Object dato) {
+		return dato == null;
 	}
 
 	public List<Producto> getProductosSeleccionados() {
@@ -88,8 +98,11 @@ public class CarritoCompra {
 		return descuento;
 	}
 
-	public double montoTotal() {
+	public double montoTotal() throws DebitarCardException {
 		double total = 0;
+		if (esDatoVacio(medioDePago) || esDatoNulo(medioDePago)) {
+			throw new DebitarCardException("Falta ingresar la Tarjeta");
+		}
 
 		for (Producto producto : this.getProductosSeleccionados()) {
 			total += producto.obtenerPrecio();
@@ -97,7 +110,7 @@ public class CarritoCompra {
 		return total - this.calcularDescuento();
 	}
 
-	public RegistroVenta finalizarVenta(TarjetaCredito tarjeta) {
+	public RegistroVenta finalizarVenta(TarjetaCredito tarjeta) throws DebitarCardException {
 		try {
 			setMedioDePago(tarjeta.obtenerEntidadBancaria());
 			if (!cliente.tarjetaValida(tarjeta)) {

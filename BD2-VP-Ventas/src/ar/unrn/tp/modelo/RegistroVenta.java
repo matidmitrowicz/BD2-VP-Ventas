@@ -66,7 +66,7 @@ public class RegistroVenta {
 		return montoTotal;
 	}
 
-	private Long getIdVenta() {
+	public Long getIdVenta() {
 		return idVenta;
 	}
 
@@ -82,7 +82,7 @@ public class RegistroVenta {
 		this.cliente = cliente;
 	}
 
-	private String getMetodoPago() {
+	public String getMetodoPago() {
 		return metodoPago;
 	}
 
@@ -90,7 +90,7 @@ public class RegistroVenta {
 		this.metodoPago = metodoPago;
 	}
 
-	private List<ProductoVendido> getMisProductos() {
+	public List<ProductoVendido> getMisProductos() {
 		return misProductos;
 	}
 
@@ -125,7 +125,7 @@ public class RegistroVenta {
 		return map;
 	}
 
-	private String getNumYearId() {
+	public String getNumYearId() {
 		return numYearId;
 	}
 

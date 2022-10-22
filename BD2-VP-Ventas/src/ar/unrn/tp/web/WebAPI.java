@@ -8,6 +8,7 @@ import ar.unrn.tp.api.ClienteService;
 import ar.unrn.tp.api.DescuentoService;
 import ar.unrn.tp.api.ProductoService;
 import ar.unrn.tp.api.VentaService;
+import ar.unrn.tp.excepciones.DebitarCardException;
 import ar.unrn.tp.excepciones.UpdateInProcessException;
 import ar.unrn.tp.modelo.Categoria;
 import ar.unrn.tp.modelo.Producto;
@@ -47,8 +48,13 @@ public class WebAPI {
 
 		app.get("/updateProducto", productoModificable()); // retorna un producto y categorias
 		app.get("/ventas", traerVentas());
+		app.get("/ultimasVentas/{id}", ultimasVentas());
 
 		app.exception(UpdateInProcessException.class, (e, ctx) -> {
+			ctx.json(Map.of("result", "error", "message", e.getMessage()));
+		});
+
+		app.exception(DebitarCardException.class, (e, ctx) -> {
 			ctx.json(Map.of("result", "error", "message", e.getMessage()));
 		});
 
@@ -162,10 +168,20 @@ public class WebAPI {
 		return ctx -> {
 			var ventas = this.ventas.ventas();
 			var list = new ArrayList<Map<String, Object>>();
+
 			for (RegistroVenta v : ventas) {
 				list.add(v.toMap());
 			}
 			ctx.json(Map.of("result", "success", "ventas", list));
+		};
+	}
+
+	private Handler ultimasVentas() {
+		return ctx -> {
+			var id = Long.valueOf(ctx.pathParam("id")); // id del cliente
+			var ventas = this.ventas.ultimasVentas(id);
+
+			ctx.json(Map.of("result", "success", "ventas", ventas));
 		};
 	}
 

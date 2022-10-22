@@ -8,10 +8,12 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import ar.unrn.tp.excepciones.DebitarCardException;
+
 class VentasTest {
 
 	@Test
-	public void calculoConPromoMarcaCaducada() {
+	public void calculoConPromoMarcaCaducada() throws DebitarCardException {
 		// Productos
 		Categoria ropa = new Categoria("Ropa Deportiva");
 		Categoria calzado = new Categoria("Calzado");
@@ -36,7 +38,7 @@ class VentasTest {
 	}
 
 	@Test
-	public void calcularConPromoNike() {
+	public void calcularConPromoNike() throws DebitarCardException {
 		// Productos
 		Categoria ropa = new Categoria("Ropa Deportiva");
 		Categoria calzado = new Categoria("Calzado");
@@ -62,7 +64,7 @@ class VentasTest {
 	}
 
 	@Test
-	public void calcularConDescuentoMediodePago() {
+	public void calcularConDescuentoMediodePago() throws DebitarCardException {
 		// Productos
 		Categoria ropa = new Categoria("Ropa Deportiva");
 		Categoria calzado = new Categoria("Calzado");
@@ -90,7 +92,7 @@ class VentasTest {
 	}
 
 	@Test
-	public void calcularMontoDescuentoComarcaDescuentoMemeCard() {
+	public void calcularMontoDescuentoComarcaDescuentoMemeCard() throws DebitarCardException {
 		// Productos
 		Categoria ropa = new Categoria("Ropa Deportiva");
 		Categoria calzado = new Categoria("Calzado");
@@ -128,7 +130,7 @@ class VentasTest {
 	}
 
 	@Test
-	public void pagarCarro() {
+	public void pagarCarro() throws DebitarCardException {
 		// Productos
 		Categoria ropa = new Categoria("Ropa Deportiva");
 		Categoria calzado = new Categoria("Calzado");
