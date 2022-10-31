@@ -21,6 +21,6 @@ public interface VentaService {
 	List<RegistroVenta> ventas();
 
 	// Devuelve las ultimas 3 ventas del Cliente
-	List ultimasVentas(Long idCliente);
+	List<RegistroVenta> ultimasVentas(Long idCliente);
 
 }

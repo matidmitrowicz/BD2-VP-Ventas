@@ -178,10 +178,13 @@ public class WebAPI {
 
 	private Handler ultimasVentas() {
 		return ctx -> {
-			var id = Long.valueOf(ctx.pathParam("id")); // id del cliente
-			var ventas = this.ventas.ultimasVentas(id);
+			var ventas = this.ventas.ultimasVentas(Long.valueOf(ctx.pathParam("id")));
+			var list = new ArrayList<Map<String, Object>>();
 
-			ctx.json(Map.of("result", "success", "ventas", ventas));
+			for (RegistroVenta v : ventas) {
+				list.add(v.toMap());
+			}
+			ctx.json(Map.of("result", "success", "ventas", list));
 		};
 	}
 

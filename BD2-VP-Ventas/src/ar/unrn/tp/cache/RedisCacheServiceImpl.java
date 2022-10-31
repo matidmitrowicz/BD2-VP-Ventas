@@ -10,10 +10,14 @@ import redis.clients.jedis.Jedis;
 
 public class RedisCacheServiceImpl implements RedisCacheService {
 
-//	private String host = "127.0.0.1";
-//	private int port = 6379;
-
+	private String host;
+	private int port;
 	private final Gson gson = new Gson();
+
+	public RedisCacheServiceImpl(String host, int port) {
+		this.host = host;
+		this.port = port;
+	}
 
 	private Jedis acquireJedisInstance() {
 

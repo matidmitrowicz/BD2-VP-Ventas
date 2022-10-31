@@ -17,7 +17,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import ar.unrn.tp.api.VentaService;
-import ar.unrn.tp.cache.RedisCacheService;
 import ar.unrn.tp.excepciones.DebitarCardException;
 import ar.unrn.tp.modelo.CarritoCompra;
 import ar.unrn.tp.modelo.Cliente;
@@ -25,15 +24,13 @@ import ar.unrn.tp.modelo.NumberYearVenta;
 import ar.unrn.tp.modelo.Producto;
 import ar.unrn.tp.modelo.Promocion;
 import ar.unrn.tp.modelo.RegistroVenta;
-import ar.unrn.tp.modelo.RegistroVentaCache;
 import ar.unrn.tp.modelo.TarjetaCredito;
 import redis.clients.jedis.Jedis;
 
 public class VentaServiceJPA implements VentaService {
 
 	private String persistence;
-
-	private RedisCacheService redisCacheService;
+//	private RedisCacheService redisCacheService;
 
 	public VentaServiceJPA(String persistence) {
 		this.persistence = persistence;
@@ -104,9 +101,10 @@ public class VentaServiceJPA implements VentaService {
 			naVenta.nextValue();
 			em.persist(naVenta);
 
-			// Borrar la cache de idCliente para luego generar nueva cache con ultimas
-			// ventas
-			redisCacheService.flushLastSellsCache(String.valueOf(idCliente));
+			// Borrar caché del cliente, para generar una nueva
+			Jedis jedis = new Jedis("localhost", 6379);
+			jedis.del(String.valueOf(idCliente));
+			jedis.close();
 
 			tx.commit();
 		} catch (Exception e) {
@@ -193,36 +191,33 @@ public class VentaServiceJPA implements VentaService {
 	}
 
 	@Override
-	public List ultimasVentas(Long idCliente) {
+	public List<RegistroVenta> ultimasVentas(Long idCliente) {
 
 		Gson gson = new Gson();
-		List<RegistroVentaCache> ultimasVentasCache = new ArrayList<RegistroVentaCache>();
+		Jedis jedis;
 		List<RegistroVenta> ultimasVentas = null;
 
-		Jedis jedis = new Jedis("localhost", 6379);
-		System.out.println("ultimas ventas");
+		jedis = new Jedis("localhost", 6379);
 		String ultimasVentasJson = jedis.get(String.valueOf(idCliente));
 		jedis.close();
 
 		// Si existe la caché para el idCliente, recupero las ventas
 		if (ultimasVentasJson != null && !ultimasVentasJson.isEmpty()) {
+			ultimasVentas = new ArrayList<RegistroVenta>();
 			ultimasVentas = gson.fromJson(ultimasVentasJson, new TypeToken<List<RegistroVenta>>() {
 			}.getType());
-			for (RegistroVenta rv : ultimasVentas) {
-				ultimasVentasCache.add(new RegistroVentaCache(rv.getIdVenta(), rv.getFecha(), rv.getMetodoPago(),
-						rv.getMontoTotal(), rv.getMisProductos(), rv.getNumYearId()));
-			}
+			System.out.println("Ventas recuperadas de caché");
 		}
 
 		// Si no está, las busco en la bd de mysql y las agrego a la caché
 		if (ultimasVentas == null) {
-			System.out.println("no hay caché, las recupero de mysql");
+			System.out.println("No hay caché, las recupero de mysql");
 			EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistence);
 			EntityManager em = emf.createEntityManager();
 			EntityTransaction tx = em.getTransaction();
 			ultimasVentas = new ArrayList<RegistroVenta>();
 			try {
-				System.out.println("buscando ventas en bd..");
+				System.out.println("Buscando ventas en MySQL..");
 				tx.begin();
 				TypedQuery<RegistroVenta> query = em.createQuery(
 						"select rv from RegistroVenta rv WHERE rv.cliente.id = :client ORDER BY rv.numYearId DESC",
@@ -231,22 +226,16 @@ public class VentaServiceJPA implements VentaService {
 				query.setMaxResults(3); // Ultimas 3
 				ultimasVentas = query.getResultList();
 				tx.commit();
-				System.out.println("ventas retornadas..");
-
-				ultimasVentasCache = new ArrayList<RegistroVentaCache>();
-				for (RegistroVenta rv : ultimasVentas) {
-					ultimasVentasCache.add(new RegistroVentaCache(rv.getIdVenta(), rv.getFecha(), rv.getMetodoPago(),
-							rv.getMontoTotal(), rv.getMisProductos(), rv.getNumYearId()));
-				}
+				System.out.println("Ventas retornadas..");
 
 				// Luego de obtener las ventas, las agrego a la caché
-				Jedis jedis2 = new Jedis("localhost", 6379);
-				jedis2.set(String.valueOf(idCliente), gson.toJson(ultimasVentasCache));
-				jedis2.close();
+				jedis = new Jedis("localhost", 6379);
+				jedis.set(String.valueOf(idCliente), gson.toJson(ultimasVentas));
+				jedis.close();
 
 			} catch (Exception e) {
 				tx.rollback();
-				throw new RuntimeException("ultimas");
+				throw new RuntimeException("ultimas ventas caché");
 			} finally {
 				if (em != null && em.isOpen())
 					em.close();
@@ -255,7 +244,7 @@ public class VentaServiceJPA implements VentaService {
 			}
 		}
 
-		return ultimasVentasCache;
+		return ultimasVentas;
 	}
 
 }
